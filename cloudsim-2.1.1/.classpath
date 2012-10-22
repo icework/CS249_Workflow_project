@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="examples"/>
+	<classpathentry kind="src" path="sources"/>
+	<classpathentry kind="lib" path="jars/cloudsim-2.1.1-sources.jar"/>
+	<classpathentry kind="lib" path="jars/cloudsim-2.1.1.jar"/>
+	<classpathentry kind="lib" path="jars/cloudsim-examples-2.1.1-sources.jar"/>
+	<classpathentry kind="lib" path="jars/cloudsim-examples-2.1.1.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>
