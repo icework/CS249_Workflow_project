@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="examples"/>
+	<classpathentry kind="src" path="sources"/>
+	<classpathentry kind="lib" path="jars/cloudsim-3.0.1-sources.jar"/>
+	<classpathentry kind="lib" path="jars/cloudsim-3.0.1.jar"/>
+	<classpathentry kind="lib" path="jars/cloudsim-examples-3.0.1-sources.jar"/>
+	<classpathentry kind="lib" path="jars/cloudsim-examples-3.0.1.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="lib" path="/Users/apple/Dropbox/CS249project/For Paper/fortheoutline/Cloudsim/flanagan.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>
