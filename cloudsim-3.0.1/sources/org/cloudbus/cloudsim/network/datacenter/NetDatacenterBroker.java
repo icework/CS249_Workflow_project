@@ -26,10 +26,11 @@ import org.cloudbus.cloudsim.distributions.UniformDistr;
 import org.cloudbus.cloudsim.lists.VmList;
 
 /**
- * NetDatacentreBroker represents a broker acting on behalf of Datacenter provider. It hides VM
- * management, as vm creation, submission of cloudlets to this VMs and destruction of VMs. NOTE- It
- * is an example only. It work on behalf of a provider not for users. One has to implement
- * interaction with user broker to this broker.
+ * NetDatacentreBroker represents a broker acting on behalf of Datacenter
+ * provider. It hides VM management, as vm creation, submission of cloudlets to
+ * this VMs and destruction of VMs. NOTE- It is an example only. It work on
+ * behalf of a provider not for users. One has to implement interaction with
+ * user broker to this broker.
  * 
  * @author Saurabh Kumar Garg
  * @since CloudSim Toolkit 3.0
@@ -90,10 +91,12 @@ public class NetDatacenterBroker extends SimEntity {
 	/**
 	 * Created a new DatacenterBroker object.
 	 * 
-	 * @param name name to be associated with this entity (as required by Sim_entity class from
-	 *        simjava package)
+	 * @param name
+	 *            name to be associated with this entity (as required by
+	 *            Sim_entity class from simjava package)
 	 * 
-	 * @throws Exception the exception
+	 * @throws Exception
+	 *             the exception
 	 * 
 	 * @pre name != null
 	 * @post $none
@@ -122,10 +125,11 @@ public class NetDatacenterBroker extends SimEntity {
 	}
 
 	/**
-	 * This method is used to send to the broker the list with virtual machines that must be
-	 * created.
+	 * This method is used to send to the broker the list with virtual machines
+	 * that must be created.
 	 * 
-	 * @param list the list
+	 * @param list
+	 *            the list
 	 * 
 	 * @pre list !=null
 	 * @post $none
@@ -137,7 +141,8 @@ public class NetDatacenterBroker extends SimEntity {
 	/**
 	 * This method is used to send to the broker the list of cloudlets.
 	 * 
-	 * @param list the list
+	 * @param list
+	 *            the list
 	 * 
 	 * @pre list !=null
 	 * @post $none
@@ -153,7 +158,8 @@ public class NetDatacenterBroker extends SimEntity {
 	/**
 	 * Processes events available for this Broker.
 	 * 
-	 * @param ev a SimEvent object
+	 * @param ev
+	 *            a SimEvent object
 	 * 
 	 * @pre ev != null
 	 * @post $none
@@ -162,49 +168,54 @@ public class NetDatacenterBroker extends SimEntity {
 	public void processEvent(SimEvent ev) {
 		switch (ev.getTag()) {
 		// Resource characteristics request
-			case CloudSimTags.RESOURCE_CHARACTERISTICS_REQUEST:
-				processResourceCharacteristicsRequest(ev);
-				break;
-			// Resource characteristics answer
-			case CloudSimTags.RESOURCE_CHARACTERISTICS:
-				processResourceCharacteristics(ev);
-				break;
-			// VM Creation answer
+		case CloudSimTags.RESOURCE_CHARACTERISTICS_REQUEST:
+			processResourceCharacteristicsRequest(ev);
+			break;
+		// Resource characteristics answer
+		case CloudSimTags.RESOURCE_CHARACTERISTICS:
+			processResourceCharacteristics(ev);
+			break;
+		// VM Creation answer
 
-			// A finished cloudlet returned
-			case CloudSimTags.CLOUDLET_RETURN:
-				processCloudletReturn(ev);
-				break;
-			// if the simulation finishes
-			case CloudSimTags.END_OF_SIMULATION:
-				shutdownEntity();
-				break;
-			case CloudSimTags.NextCycle:
-				if (NetworkConstants.BASE) {
-					createVmsInDatacenterBase(linkDC.getId());
-				}
+		// A finished cloudlet returned
+		case CloudSimTags.CLOUDLET_RETURN:
+			processCloudletReturn(ev);
+			break;
+		// if the simulation finishes
+		case CloudSimTags.END_OF_SIMULATION:
+			shutdownEntity();
+			break;
+		case CloudSimTags.NextCycle:
+			if (NetworkConstants.BASE) {
+				createVmsInDatacenterBase(linkDC.getId());
+			}
 
-				break;
-			// other unknown tags are processed by this method
-			default:
-				processOtherEvent(ev);
-				break;
+			break;
+		// other unknown tags are processed by this method
+		default:
+			processOtherEvent(ev);
+			break;
 		}
 	}
 
 	/**
-	 * Process the return of a request for the characteristics of a PowerDatacenter.
+	 * Process the return of a request for the characteristics of a
+	 * PowerDatacenter.
 	 * 
-	 * @param ev a SimEvent object
+	 * @param ev
+	 *            a SimEvent object
 	 * 
 	 * @pre ev != $null
 	 * @post $none
 	 */
 	protected void processResourceCharacteristics(SimEvent ev) {
-		DatacenterCharacteristics characteristics = (DatacenterCharacteristics) ev.getData();
-		getDatacenterCharacteristicsList().put(characteristics.getId(), characteristics);
+		DatacenterCharacteristics characteristics = (DatacenterCharacteristics) ev
+				.getData();
+		getDatacenterCharacteristicsList().put(characteristics.getId(),
+				characteristics);
 
-		if (getDatacenterCharacteristicsList().size() == getDatacenterIdsList().size()) {
+		if (getDatacenterCharacteristicsList().size() == getDatacenterIdsList()
+				.size()) {
 			setDatacenterRequestedIdsList(new ArrayList<Integer>());
 			createVmsInDatacenterBase(getDatacenterIdsList().get(0));
 		}
@@ -213,7 +224,8 @@ public class NetDatacenterBroker extends SimEntity {
 	/**
 	 * Process a request for the characteristics of a PowerDatacenter.
 	 * 
-	 * @param ev a SimEvent object
+	 * @param ev
+	 *            a SimEvent object
 	 * 
 	 * @pre ev != $null
 	 * @post $none
@@ -223,18 +235,21 @@ public class NetDatacenterBroker extends SimEntity {
 		setDatacenterIdsList(CloudSim.getCloudResourceList());
 		setDatacenterCharacteristicsList(new HashMap<Integer, DatacenterCharacteristics>());
 
-		Log.printLine(CloudSim.clock() + ": " + getName() + ": Cloud Resource List received with "
+		Log.printLine(CloudSim.clock() + ": " + getName()
+				+ ": Cloud Resource List received with "
 				+ getDatacenterIdsList().size() + " resource(s)");
 
 		for (Integer datacenterId : getDatacenterIdsList()) {
-			sendNow(datacenterId, CloudSimTags.RESOURCE_CHARACTERISTICS, getId());
+			sendNow(datacenterId, CloudSimTags.RESOURCE_CHARACTERISTICS,
+					getId());
 		}
 	}
 
 	/**
 	 * Process the ack received due to a request for VM creation.
 	 * 
-	 * @param ev a SimEvent object
+	 * @param ev
+	 *            a SimEvent object
 	 * 
 	 * @pre ev != null
 	 * @post $none
@@ -243,7 +258,8 @@ public class NetDatacenterBroker extends SimEntity {
 	/**
 	 * Process a cloudlet return event.
 	 * 
-	 * @param ev a SimEvent object
+	 * @param ev
+	 *            a SimEvent object
 	 * 
 	 * @pre ev != $null
 	 * @post $none
@@ -253,8 +269,10 @@ public class NetDatacenterBroker extends SimEntity {
 		getCloudletReceivedList().add(cloudlet);
 		cloudletsSubmitted--;
 		// all cloudlets executed
-		if (getCloudletList().size() == 0 && cloudletsSubmitted == 0 && NetworkConstants.iteration > 10) {
-			Log.printLine(CloudSim.clock() + ": " + getName() + ": All Cloudlets executed. Finishing...");
+		if (getCloudletList().size() == 0 && cloudletsSubmitted == 0
+				&& NetworkConstants.iteration > 10) {
+			Log.printLine(CloudSim.clock() + ": " + getName()
+					+ ": All Cloudlets executed. Finishing...");
 			clearDatacenters();
 			finishExecution();
 		} else { // some cloudlets haven't finished yet
@@ -269,17 +287,19 @@ public class NetDatacenterBroker extends SimEntity {
 	}
 
 	/**
-	 * Overrides this method when making a new and different type of Broker. This method is called
-	 * by {@link #body()} for incoming unknown tags.
+	 * Overrides this method when making a new and different type of Broker.
+	 * This method is called by {@link #body()} for incoming unknown tags.
 	 * 
-	 * @param ev a SimEvent object
+	 * @param ev
+	 *            a SimEvent object
 	 * 
 	 * @pre ev != null
 	 * @post $none
 	 */
 	protected void processOtherEvent(SimEvent ev) {
 		if (ev == null) {
-			Log.printLine(getName() + ".processOtherEvent(): " + "Error - an event is null.");
+			Log.printLine(getName() + ".processOtherEvent(): "
+					+ "Error - an event is null.");
 			return;
 		}
 
@@ -288,9 +308,11 @@ public class NetDatacenterBroker extends SimEntity {
 	}
 
 	/**
-	 * Create the virtual machines in a datacenter and submit/schedule cloudlets to them.
+	 * Create the virtual machines in a datacenter and submit/schedule cloudlets
+	 * to them.
 	 * 
-	 * @param datacenterId Id of the chosen PowerDatacenter
+	 * @param datacenterId
+	 *            Id of the chosen PowerDatacenter
 	 * 
 	 * @pre $none
 	 * @post $none
@@ -307,9 +329,92 @@ public class NetDatacenterBroker extends SimEntity {
 		}
 
 		// generate Application execution Requests
-		for (int i = 0; i < 100; i++) {
+		for (int i = 0; i < 5; i++) {
 			this.getAppCloudletList().add(
-					new WorkflowApp(AppCloudlet.APP_Workflow, NetworkConstants.currentAppId, 0, 0, getId()));
+					new ExampleWorkflow(AppCloudlet.APP_Workflow,
+							NetworkConstants.currentAppId, 0, 8, getId()));
+			NetworkConstants.currentAppId++;
+
+		}
+		int k = 0;
+
+		// schedule the application on VMs
+		for (AppCloudlet app : this.getAppCloudletList()) {
+
+			List<Integer> vmids = new ArrayList<Integer>();
+			/*int numVms = linkDC.getVmList().size();
+			UniformDistr ufrnd = new UniformDistr(0, numVms, 5);
+			System.out.println("app.numbervm: " + app.numbervm);
+			for (int i = 0; i < app.numbervm; i++) {
+
+				int vmid = (int) ufrnd.sample();
+				vmids.add(vmid);
+
+			}*/
+			System.out.println("app.numbervm: " + app.numbervm);
+			for (int i = 0; i < 5; i++)
+			{
+				Integer vmId = (Integer) i;
+				vmids.add(vmId);
+			}
+			if (vmids != null) {
+				if (!vmids.isEmpty()) {
+
+					app.createCloudletList(vmids);
+					for (int i = 0; i < 5; i++) {
+						app.clist.get(i).setUserId(getId());
+						appCloudletRecieved.put(app.appID, app.numbervm);
+						this.getCloudletSubmittedList().add(app.clist.get(i));
+						cloudletsSubmitted++;
+
+						// Sending cloudlet
+						sendNow(getVmsToDatacentersMap().get(
+								this.getVmList().get(0).getId()),
+								CloudSimTags.CLOUDLET_SUBMIT, app.clist.get(i));
+					}
+					System.out.println("app" + (k++));
+				}
+			}
+
+		}
+		setAppCloudletList(new ArrayList<AppCloudlet>());
+		if (NetworkConstants.iteration < 10) {
+
+			NetworkConstants.iteration++;
+			this.schedule(getId(), NetworkConstants.nexttime,
+					CloudSimTags.NextCycle);
+		}
+
+		setVmsRequested(requestedVms);
+		setVmsAcks(0);
+	}
+
+	/**
+	 * Create the virtual machines in a datacenter and submit/schedule cloudlets
+	 * to them.
+	 * 
+	 * @param datacenterId
+	 *            Id of the chosen PowerDatacenter
+	 * 
+	 * @pre $none
+	 * @post $none
+	 */
+	protected void createVmsInDatacenterBase2(int datacenterId) {
+		// send as much vms as possible for this datacenter before trying the
+		// next one
+		int requestedVms = 0;
+
+		// All host will have two VMs (assumption) VM is the minimum unit
+		if (createvmflag) {
+			CreateVMs(datacenterId);
+			createvmflag = false;
+		}
+
+		// generate Application execution Requests
+		for (int i = 0; i < 1; i++) {
+			this.getAppCloudletList().add(
+					new WorkflowApp(AppCloudlet.APP_Workflow,
+							NetworkConstants.currentAppId, 0, 0, getId()));
 			NetworkConstants.currentAppId++;
 
 		}
@@ -339,10 +444,9 @@ public class NetDatacenterBroker extends SimEntity {
 						cloudletsSubmitted++;
 
 						// Sending cloudlet
-						sendNow(
-								getVmsToDatacentersMap().get(this.getVmList().get(0).getId()),
-								CloudSimTags.CLOUDLET_SUBMIT,
-								app.clist.get(i));
+						sendNow(getVmsToDatacentersMap().get(
+								this.getVmList().get(0).getId()),
+								CloudSimTags.CLOUDLET_SUBMIT, app.clist.get(i));
 					}
 					System.out.println("app" + (k++));
 				}
@@ -353,7 +457,8 @@ public class NetDatacenterBroker extends SimEntity {
 		if (NetworkConstants.iteration < 10) {
 
 			NetworkConstants.iteration++;
-			this.schedule(getId(), NetworkConstants.nexttime, CloudSimTags.NextCycle);
+			this.schedule(getId(), NetworkConstants.nexttime,
+					CloudSimTags.NextCycle);
 		}
 
 		setVmsRequested(requestedVms);
@@ -362,27 +467,23 @@ public class NetDatacenterBroker extends SimEntity {
 
 	private void CreateVMs(int datacenterId) {
 		// two VMs per host
+		System.out.println("pointer");
+		System.out.println("here" + linkDC.getHostList());
 		int numVM = linkDC.getHostList().size() * NetworkConstants.maxhostVM;
+
 		for (int i = 0; i < numVM; i++) {
 			int vmid = i;
 			int mips = 1;
 			long size = 10000; // image size (MB)
 			int ram = 512; // vm memory (MB)
 			long bw = 1000;
-			int pesNumber = NetworkConstants.HOST_PEs / NetworkConstants.maxhostVM;
+			int pesNumber = NetworkConstants.HOST_PEs
+					/ NetworkConstants.maxhostVM;
 			String vmm = "Xen"; // VMM name
 
 			// create VM
-			NetworkVm vm = new NetworkVm(
-					vmid,
-					getId(),
-					mips,
-					pesNumber,
-					ram,
-					bw,
-					size,
-					vmm,
-					new NetworkCloudletSpaceSharedScheduler());
+			NetworkVm vm = new NetworkVm(vmid, getId(), mips, pesNumber, ram,
+					bw, size, vmm, new NetworkCloudletSpaceSharedScheduler());
 			linkDC.processVmCreateNetwork(vm);
 			// add the VM to the vmList
 			getVmList().add(vm);
@@ -402,8 +503,10 @@ public class NetDatacenterBroker extends SimEntity {
 	 */
 	protected void clearDatacenters() {
 		for (Vm vm : getVmsCreatedList()) {
-			Log.printLine(CloudSim.clock() + ": " + getName() + ": Destroying VM #" + vm.getId());
-			sendNow(getVmsToDatacentersMap().get(vm.getId()), CloudSimTags.VM_DESTROY, vm);
+			Log.printLine(CloudSim.clock() + ": " + getName()
+					+ ": Destroying VM #" + vm.getId());
+			sendNow(getVmsToDatacentersMap().get(vm.getId()),
+					CloudSimTags.VM_DESTROY, vm);
 		}
 
 		getVmsCreatedList().clear();
@@ -421,6 +524,7 @@ public class NetDatacenterBroker extends SimEntity {
 
 	/*
 	 * (non-Javadoc)
+	 * 
 	 * @see cloudsim.core.SimEntity#shutdownEntity()
 	 */
 	@Override
@@ -430,6 +534,7 @@ public class NetDatacenterBroker extends SimEntity {
 
 	/*
 	 * (non-Javadoc)
+	 * 
 	 * @see cloudsim.core.SimEntity#startEntity()
 	 */
 	@Override
@@ -441,7 +546,8 @@ public class NetDatacenterBroker extends SimEntity {
 	/**
 	 * Gets the vm list.
 	 * 
-	 * @param <T> the generic type
+	 * @param <T>
+	 *            the generic type
 	 * @return the vm list
 	 */
 	@SuppressWarnings("unchecked")
@@ -452,8 +558,10 @@ public class NetDatacenterBroker extends SimEntity {
 	/**
 	 * Sets the vm list.
 	 * 
-	 * @param <T> the generic type
-	 * @param vmList the new vm list
+	 * @param <T>
+	 *            the generic type
+	 * @param vmList
+	 *            the new vm list
 	 */
 	protected <T extends Vm> void setVmList(List<T> vmList) {
 		this.vmList = vmList;
@@ -462,7 +570,8 @@ public class NetDatacenterBroker extends SimEntity {
 	/**
 	 * Gets the cloudlet list.
 	 * 
-	 * @param <T> the generic type
+	 * @param <T>
+	 *            the generic type
 	 * @return the cloudlet list
 	 */
 	@SuppressWarnings("unchecked")
@@ -473,10 +582,13 @@ public class NetDatacenterBroker extends SimEntity {
 	/**
 	 * Sets the cloudlet list.
 	 * 
-	 * @param <T> the generic type
-	 * @param cloudletList the new cloudlet list
+	 * @param <T>
+	 *            the generic type
+	 * @param cloudletList
+	 *            the new cloudlet list
 	 */
-	protected <T extends NetworkCloudlet> void setCloudletList(List<T> cloudletList) {
+	protected <T extends NetworkCloudlet> void setCloudletList(
+			List<T> cloudletList) {
 		this.cloudletList = cloudletList;
 	}
 
@@ -485,14 +597,16 @@ public class NetDatacenterBroker extends SimEntity {
 		return (List<T>) appCloudletList;
 	}
 
-	public <T extends AppCloudlet> void setAppCloudletList(List<T> appCloudletList) {
+	public <T extends AppCloudlet> void setAppCloudletList(
+			List<T> appCloudletList) {
 		this.appCloudletList = appCloudletList;
 	}
 
 	/**
 	 * Gets the cloudlet submitted list.
 	 * 
-	 * @param <T> the generic type
+	 * @param <T>
+	 *            the generic type
 	 * @return the cloudlet submitted list
 	 */
 	@SuppressWarnings("unchecked")
@@ -503,17 +617,21 @@ public class NetDatacenterBroker extends SimEntity {
 	/**
 	 * Sets the cloudlet submitted list.
 	 * 
-	 * @param <T> the generic type
-	 * @param cloudletSubmittedList the new cloudlet submitted list
+	 * @param <T>
+	 *            the generic type
+	 * @param cloudletSubmittedList
+	 *            the new cloudlet submitted list
 	 */
-	protected <T extends Cloudlet> void setCloudletSubmittedList(List<T> cloudletSubmittedList) {
+	protected <T extends Cloudlet> void setCloudletSubmittedList(
+			List<T> cloudletSubmittedList) {
 		this.cloudletSubmittedList = cloudletSubmittedList;
 	}
 
 	/**
 	 * Gets the cloudlet received list.
 	 * 
-	 * @param <T> the generic type
+	 * @param <T>
+	 *            the generic type
 	 * @return the cloudlet received list
 	 */
 	@SuppressWarnings("unchecked")
@@ -524,17 +642,21 @@ public class NetDatacenterBroker extends SimEntity {
 	/**
 	 * Sets the cloudlet received list.
 	 * 
-	 * @param <T> the generic type
-	 * @param cloudletReceivedList the new cloudlet received list
+	 * @param <T>
+	 *            the generic type
+	 * @param cloudletReceivedList
+	 *            the new cloudlet received list
 	 */
-	protected <T extends Cloudlet> void setCloudletReceivedList(List<T> cloudletReceivedList) {
+	protected <T extends Cloudlet> void setCloudletReceivedList(
+			List<T> cloudletReceivedList) {
 		this.cloudletReceivedList = cloudletReceivedList;
 	}
 
 	/**
 	 * Gets the vm list.
 	 * 
-	 * @param <T> the generic type
+	 * @param <T>
+	 *            the generic type
 	 * @return the vm list
 	 */
 	@SuppressWarnings("unchecked")
@@ -545,8 +667,10 @@ public class NetDatacenterBroker extends SimEntity {
 	/**
 	 * Sets the vm list.
 	 * 
-	 * @param <T> the generic type
-	 * @param vmsCreatedList the vms created list
+	 * @param <T>
+	 *            the generic type
+	 * @param vmsCreatedList
+	 *            the vms created list
 	 */
 	protected <T extends Vm> void setVmsCreatedList(List<T> vmsCreatedList) {
 		this.vmsCreatedList = vmsCreatedList;
@@ -564,7 +688,8 @@ public class NetDatacenterBroker extends SimEntity {
 	/**
 	 * Sets the vms requested.
 	 * 
-	 * @param vmsRequested the new vms requested
+	 * @param vmsRequested
+	 *            the new vms requested
 	 */
 	protected void setVmsRequested(int vmsRequested) {
 		this.vmsRequested = vmsRequested;
@@ -582,7 +707,8 @@ public class NetDatacenterBroker extends SimEntity {
 	/**
 	 * Sets the vms acks.
 	 * 
-	 * @param vmsAcks the new vms acks
+	 * @param vmsAcks
+	 *            the new vms acks
 	 */
 	protected void setVmsAcks(int vmsAcks) {
 		this.vmsAcks = vmsAcks;
@@ -607,7 +733,8 @@ public class NetDatacenterBroker extends SimEntity {
 	/**
 	 * Sets the vms destroyed.
 	 * 
-	 * @param vmsDestroyed the new vms destroyed
+	 * @param vmsDestroyed
+	 *            the new vms destroyed
 	 */
 	protected void setVmsDestroyed(int vmsDestroyed) {
 		this.vmsDestroyed = vmsDestroyed;
@@ -625,7 +752,8 @@ public class NetDatacenterBroker extends SimEntity {
 	/**
 	 * Sets the datacenter ids list.
 	 * 
-	 * @param datacenterIdsList the new datacenter ids list
+	 * @param datacenterIdsList
+	 *            the new datacenter ids list
 	 */
 	protected void setDatacenterIdsList(List<Integer> datacenterIdsList) {
 		this.datacenterIdsList = datacenterIdsList;
@@ -643,9 +771,11 @@ public class NetDatacenterBroker extends SimEntity {
 	/**
 	 * Sets the vms to datacenters map.
 	 * 
-	 * @param vmsToDatacentersMap the vms to datacenters map
+	 * @param vmsToDatacentersMap
+	 *            the vms to datacenters map
 	 */
-	protected void setVmsToDatacentersMap(Map<Integer, Integer> vmsToDatacentersMap) {
+	protected void setVmsToDatacentersMap(
+			Map<Integer, Integer> vmsToDatacentersMap) {
 		this.vmsToDatacentersMap = vmsToDatacentersMap;
 	}
 
@@ -661,7 +791,8 @@ public class NetDatacenterBroker extends SimEntity {
 	/**
 	 * Sets the datacenter characteristics list.
 	 * 
-	 * @param datacenterCharacteristicsList the datacenter characteristics list
+	 * @param datacenterCharacteristicsList
+	 *            the datacenter characteristics list
 	 */
 	protected void setDatacenterCharacteristicsList(
 			Map<Integer, DatacenterCharacteristics> datacenterCharacteristicsList) {
@@ -680,9 +811,11 @@ public class NetDatacenterBroker extends SimEntity {
 	/**
 	 * Sets the datacenter requested ids list.
 	 * 
-	 * @param datacenterRequestedIdsList the new datacenter requested ids list
+	 * @param datacenterRequestedIdsList
+	 *            the new datacenter requested ids list
 	 */
-	protected void setDatacenterRequestedIdsList(List<Integer> datacenterRequestedIdsList) {
+	protected void setDatacenterRequestedIdsList(
+			List<Integer> datacenterRequestedIdsList) {
 		this.datacenterRequestedIdsList = datacenterRequestedIdsList;
 	}
 
