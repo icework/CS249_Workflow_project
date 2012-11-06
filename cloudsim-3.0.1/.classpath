@@ -6,7 +6,7 @@
 	<classpathentry kind="lib" path="jars/cloudsim-3.0.1.jar"/>
 	<classpathentry kind="lib" path="jars/cloudsim-examples-3.0.1-sources.jar"/>
 	<classpathentry kind="lib" path="jars/cloudsim-examples-3.0.1.jar"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="lib" path="/Users/apple/Documents/program/CS249_Workflow_project/cloudsim-3.0.1/jars/flanagan.jar"/>
+	<classpathentry kind="lib" path="jars/flanagan.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.7"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

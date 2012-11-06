@@ -847,7 +847,9 @@ public class CloudSim {
 					&& ((future.size() > 0 && clock <= pauseAt && pauseAt <= future.iterator().next()
 							.eventTime()) || future.size() == 0 && pauseAt <= clock)) {
 				pauseSimulation();
+				
 				clock = pauseAt;
+				
 			}
 
 			while (paused) {
