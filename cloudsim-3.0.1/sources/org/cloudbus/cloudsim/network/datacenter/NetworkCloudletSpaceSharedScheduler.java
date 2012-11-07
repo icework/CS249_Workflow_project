@@ -124,6 +124,13 @@ public class NetworkCloudletSpaceSharedScheduler extends CloudletScheduler {
 					// update the time
 					cl.timespentInStage = Math.round(CloudSim.clock() - cl.timetostartStage);
 					if (cl.timespentInStage >= st.time) {
+						System.out.println("current task: " + cl.getVmId());
+						System.out.println("st.type == NetworkConstants.EXECUTION");
+						System.out.println("CloudSim.clock(): " + CloudSim.clock());
+						System.out.println("cl.timetostartStage: " + cl.timetostartStage);
+						System.out.println("cl.timespentInStage: " + cl.timespentInStage);
+						System.out.println("st.time: " + st.time);
+						System.out.println("changetonextstage");
 						changetonextstage(cl, st);
 						// change the stage
 					}
@@ -142,6 +149,13 @@ public class NetworkCloudletSpaceSharedScheduler extends CloudletScheduler {
 								st.time = CloudSim.clock() - pkt.sendtime;
 								changetonextstage(cl, st);
 								pkttoremove.add(pkt);
+								System.out.println("current task: " + cl.getVmId());
+								System.out.println("st.type == NetworkConstants.WAIT_RECV");
+								System.out.println("CloudSim.clock(): " + CloudSim.clock());
+								System.out.println("pkt.recievetime: " + pkt.recievetime);
+								System.out.println("pkt.sendtime: " + pkt.sendtime);
+								System.out.println("st.time = CloudSim.clock() - pkt.sendtime: " + st.time);
+								System.out.println("changetonextstage");
 							}
 						}
 						pktlist.removeAll(pkttoremove);
@@ -254,6 +268,9 @@ public class NetworkCloudletSpaceSharedScheduler extends CloudletScheduler {
 					}
 					pktlist.add(pkt);
 					pkttosend.put(cl.getVmId(), pktlist);
+					System.out.println("current task: " + cl.getVmId());
+					System.out.println("st.type == NetworkConstants.WAIT_SEND");
+					System.out.println("CloudSim.clock(): " + CloudSim.clock());
 
 				} else {
 					break;

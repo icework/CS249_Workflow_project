@@ -317,7 +317,7 @@ public class NetDatacenterBroker extends SimEntity {
 	 * @pre $none
 	 * @post $none
 	 */
-	protected void createVmsInDatacenterBase(int datacenterId) {
+	protected void createVmsInDatacenterBase1(int datacenterId) {
 		// send as much vms as possible for this datacenter before trying the
 		// next one
 		int requestedVms = 0;
@@ -399,7 +399,7 @@ public class NetDatacenterBroker extends SimEntity {
 	 * @pre $none
 	 * @post $none
 	 */
-	protected void createVmsInDatacenterBase2(int datacenterId) {
+	protected void createVmsInDatacenterBase(int datacenterId) {
 		// send as much vms as possible for this datacenter before trying the
 		// next one
 		int requestedVms = 0;

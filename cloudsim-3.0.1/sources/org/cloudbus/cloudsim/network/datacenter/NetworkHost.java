@@ -187,6 +187,9 @@ public class NetworkHost extends Host {
 		double avband = bandwidth / packetTosendGlobal.size();
 		for (NetworkPacket hs : packetTosendGlobal) {
 			double delay = (1000 * hs.pkt.data) / avband;
+			System.out.println("avband: " + avband);
+			System.out.println("hs.pkt.data: " + hs.pkt.data);
+			System.out.println("delay: " + delay);
 			NetworkConstants.totaldatatransfer += hs.pkt.data;
 
 			CloudSim.send(getDatacenter().getId(), sw.getId(), delay, CloudSimTags.Network_Event_UP, hs);
