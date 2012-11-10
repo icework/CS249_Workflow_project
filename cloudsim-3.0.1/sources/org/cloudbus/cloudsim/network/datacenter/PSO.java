@@ -1,5 +1,6 @@
 package org.cloudbus.cloudsim.network.datacenter;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
@@ -12,13 +13,14 @@ import org.cloudbus.cloudsim.Vm;
 
 public class PSO {
 
-	public PSO(double[][] td, double[] et){
+	public PSO(double[][] td, double[] et, Datacenter dc){
 		workFlowDataTrans = td;
 		workFlowTaskExcution = et;
+		datacenter = dc;
 	}
 	
 	
-	public int[] runPSO(){
+	public ArrayList<Integer> runPSO(){
 		// Create a swarm (using 'MyParticle' as sample particle and 'MyFitnessFunction' as fitness function)
 		Swarm swarm = new Swarm(Swarm.DEFAULT_NUMBER_OF_PARTICLES, new MyParticle(workFlowTaskExcution.length), new MyFitnessFunction(workFlowDataTrans, workFlowTaskExcution, vmData, vmTransferCost));
 		// Use neighborhood
@@ -52,10 +54,10 @@ public class PSO {
 		
 		// transfer double to int
 		double[] bestPosition = swarm.getBestPosition();
-		int[] intBestPosition = new int[bestPosition.length];
+		ArrayList<Integer> intBestPosition = new ArrayList<Integer>();
 		for(int i = 0; i < bestPosition.length; i++ )
 		{
-			intBestPosition[i] = (int)bestPosition[i];
+			intBestPosition.add((int)bestPosition[i]);
 		}
 		return intBestPosition;
 	}
