@@ -24,6 +24,7 @@ import org.cloudbus.cloudsim.core.SimEntity;
 import org.cloudbus.cloudsim.core.SimEvent;
 import org.cloudbus.cloudsim.distributions.UniformDistr;
 import org.cloudbus.cloudsim.lists.VmList;
+import org.cloudbus.cloudsim.network.datacenter.PSO;
 
 /**
  * NetDatacentreBroker represents a broker acting on behalf of Datacenter
@@ -189,7 +190,7 @@ public class NetDatacenterBroker extends SimEntity {
 			break;
 		case CloudSimTags.NextCycle:
 			if (NetworkConstants.BASE) {
-				createVmsAndWorkflows(linkDC.getId());
+				createVmAndWorkflow(linkDC.getId());
 			}
 
 			break;
@@ -219,7 +220,7 @@ public class NetDatacenterBroker extends SimEntity {
 		if (getDatacenterCharacteristicsList().size() == getDatacenterIdsList()
 				.size()) {
 			setDatacenterRequestedIdsList(new ArrayList<Integer>());
-			createVmsAndWorkflows(getDatacenterIdsList().get(0));
+			createVmAndWorkflow(getDatacenterIdsList().get(0));
 		}
 	}
 
@@ -282,7 +283,7 @@ public class NetDatacenterBroker extends SimEntity {
 				// all the cloudlets sent finished. It means that some bount
 				// cloudlet is waiting its VM be created
 				clearDatacenters();
-				createVmsAndWorkflows(0);
+				createVmAndWorkflow(0);
 			}
 
 		}
@@ -319,7 +320,7 @@ public class NetDatacenterBroker extends SimEntity {
 	 * @pre $none
 	 * @post $none
 	 */
-	protected void createVmsInDatacenterBase1(int datacenterId) {
+	protected void createVmAndWorkflow1(int datacenterId) {
 		// send as much vms as possible for this datacenter before trying the
 		// next one
 		int requestedVms = 0;
@@ -401,7 +402,7 @@ public class NetDatacenterBroker extends SimEntity {
 	 * @pre $none
 	 * @post $none
 	 */
-	protected void createVmsInDatacenterBase2(int datacenterId) {
+	protected void createVmAndWorkflow2(int datacenterId) {
 		// send as much vms as possible for this datacenter before trying the
 		// next one
 		int requestedVms = 0;
@@ -483,8 +484,8 @@ public class NetDatacenterBroker extends SimEntity {
 		for (int i = 0; i < 1; i++) 
 		{
 			this.getAppCloudletList().add(
-					new ExampleWorkflow(AppCloudlet.APP_Workflow,
-							NetworkConstants.currentAppId, 0, 8, getId()));
+					new WorkflowApp(AppCloudlet.APP_Workflow,
+							NetworkConstants.currentAppId, 0, getVmList().size(), getId()));
 			NetworkConstants.currentAppId++;
 
 		}
@@ -494,16 +495,6 @@ public class NetDatacenterBroker extends SimEntity {
 		for (AppCloudlet app : this.getAppCloudletList()) 
 		{
 
-			List<Integer> vmids = new ArrayList<Integer>();
-			/*
-			 * int numVms = linkDC.getVmList().size(); UniformDistr ufrnd = new
-			 * UniformDistr(0, numVms, 5); System.out.println("app.numbervm: " +
-			 * app.numbervm); for (int i = 0; i < app.numbervm; i++) {
-			 * 
-			 * int vmid = (int) ufrnd.sample(); vmids.add(vmid);
-			 * 
-			 * }
-			 */
 			System.out.println("app.numbervm: " + app.numbervm);
 		
 			if (taskToVmMap != null) 
@@ -511,7 +502,7 @@ public class NetDatacenterBroker extends SimEntity {
 				if (!taskToVmMap.isEmpty()) 
 				{
 					app.createCloudletList(taskToVmMap);
-					for (int i = 0; i < 5; i++) {
+					for (int i = 0; i < workflowExecutionMI.length; i++) {
 						app.clist.get(i).setUserId(getId());
 						appCloudletRecieved.put(app.appID, app.numbervm);
 						this.getCloudletSubmittedList().add(app.clist.get(i));
@@ -546,7 +537,7 @@ public class NetDatacenterBroker extends SimEntity {
 	 * @pre $none
 	 * @post $none
 	 */
-	protected void createVmsAndWorkflows(int datacenterId) {
+	protected void createVmAndWorkflow(int datacenterId) {
 		
 		createVMsInDatecenter(datacenterId);
 		
@@ -555,7 +546,10 @@ public class NetDatacenterBroker extends SimEntity {
 		psoScheduling = new PSO(workflowDataTransferMap, workflowExecutionMI, linkDC);
 		
 		ArrayList<Integer> taskToVmMap = psoScheduling.runPSO();
-		
+		/*ArrayList<Integer> taskToVmMap = new ArrayList<Integer>();
+		taskToVmMap.add(5);
+		taskToVmMap.add(0);
+		taskToVmMap.add(3);*/
 		createWorkflow(workflowDataTransferMap, workflowExecutionMI, taskToVmMap);
 		
 		// send as much vms as possible for this datacenter before trying the
@@ -572,7 +566,8 @@ public class NetDatacenterBroker extends SimEntity {
 		System.out.println("here" + linkDC.getHostList());
 		int numVM = linkDC.getHostList().size() * NetworkConstants.maxhostVM;
 		
-		double[] mips = {1.011, 1.004, 1.013, 1.0, 0.99, 1.043, 1.023, 0.998};
+		double[] mips = {1, 1, 1, 1, 1, 1, 1, 1};
+		//double[] mips = {1.011, 1.004, 1.013, 1.0, 0.99, 1.043, 1.023, 0.998};
 		long size = 10000; // image size (MB)
 		int ram = 512; // vm memory (MB)
 		long bw = 1000;

@@ -99,8 +99,14 @@ public class NetworkVm extends Vm implements Comparable<Object> {
 		return executionCost;
 	}
 	
-	public double[] getBandwidthCost()
+	public ArrayList<Double> getBandwidthCost()
 	{
-		return transferCost;
+		ArrayList<Double> bandwidthCost = new ArrayList<Double>();
+		for (int i = 0; i < transferCost.length; i++)
+		{
+			bandwidthCost.add(transferCost[i]);
+		}
+
+		return bandwidthCost;
 	}
 }
