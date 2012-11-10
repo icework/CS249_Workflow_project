@@ -83,6 +83,8 @@ public class NetDatacenterBroker extends SimEntity {
 	private Map<Integer, DatacenterCharacteristics> datacenterCharacteristicsList;
 
 	public static NetworkDatacenter linkDC;
+	
+	private PSO psoScheduling;
 
 	public boolean createvmflag = true;
 
@@ -187,7 +189,7 @@ public class NetDatacenterBroker extends SimEntity {
 			break;
 		case CloudSimTags.NextCycle:
 			if (NetworkConstants.BASE) {
-				createVmsInDatacenterBase(linkDC.getId());
+				createVmsAndWorkflows(linkDC.getId());
 			}
 
 			break;
@@ -217,7 +219,7 @@ public class NetDatacenterBroker extends SimEntity {
 		if (getDatacenterCharacteristicsList().size() == getDatacenterIdsList()
 				.size()) {
 			setDatacenterRequestedIdsList(new ArrayList<Integer>());
-			createVmsInDatacenterBase(getDatacenterIdsList().get(0));
+			createVmsAndWorkflows(getDatacenterIdsList().get(0));
 		}
 	}
 
@@ -280,7 +282,7 @@ public class NetDatacenterBroker extends SimEntity {
 				// all the cloudlets sent finished. It means that some bount
 				// cloudlet is waiting its VM be created
 				clearDatacenters();
-				createVmsInDatacenterBase(0);
+				createVmsAndWorkflows(0);
 			}
 
 		}
@@ -399,7 +401,7 @@ public class NetDatacenterBroker extends SimEntity {
 	 * @pre $none
 	 * @post $none
 	 */
-	protected void createVmsInDatacenterBase(int datacenterId) {
+	protected void createVmsInDatacenterBase2(int datacenterId) {
 		// send as much vms as possible for this datacenter before trying the
 		// next one
 		int requestedVms = 0;
@@ -464,8 +466,145 @@ public class NetDatacenterBroker extends SimEntity {
 		setVmsRequested(requestedVms);
 		setVmsAcks(0);
 	}
+	
+	private void createVMsInDatecenter(int datacenterId) {
 
+		// All host will have two VMs (assumption) VM is the minimum unit
+		if (createvmflag) 
+		{
+			CreateVMs(datacenterId);
+			createvmflag = false;
+		}
+	}
+	
+	private void createWorkflow(double[][]workflowDataTransferMap, double[]workflowExecutionMI, ArrayList<Integer> taskToVmMap) 
+	{
+		// generate Application execution Requests
+		for (int i = 0; i < 1; i++) 
+		{
+			this.getAppCloudletList().add(
+					new ExampleWorkflow(AppCloudlet.APP_Workflow,
+							NetworkConstants.currentAppId, 0, 8, getId()));
+			NetworkConstants.currentAppId++;
+
+		}
+		int k = 0;
+
+		// schedule the application on VMs
+		for (AppCloudlet app : this.getAppCloudletList()) 
+		{
+
+			List<Integer> vmids = new ArrayList<Integer>();
+			/*
+			 * int numVms = linkDC.getVmList().size(); UniformDistr ufrnd = new
+			 * UniformDistr(0, numVms, 5); System.out.println("app.numbervm: " +
+			 * app.numbervm); for (int i = 0; i < app.numbervm; i++) {
+			 * 
+			 * int vmid = (int) ufrnd.sample(); vmids.add(vmid);
+			 * 
+			 * }
+			 */
+			System.out.println("app.numbervm: " + app.numbervm);
+		
+			if (taskToVmMap != null) 
+			{
+				if (!taskToVmMap.isEmpty()) 
+				{
+					app.createCloudletList(taskToVmMap);
+					for (int i = 0; i < 5; i++) {
+						app.clist.get(i).setUserId(getId());
+						appCloudletRecieved.put(app.appID, app.numbervm);
+						this.getCloudletSubmittedList().add(app.clist.get(i));
+						cloudletsSubmitted++;
+
+						// Sending cloudlet
+						sendNow(getVmsToDatacentersMap().get(
+								this.getVmList().get(0).getId()),
+								CloudSimTags.CLOUDLET_SUBMIT, app.clist.get(i));
+					}
+					System.out.println("app" + (k++));
+				}
+			}
+
+		}
+		setAppCloudletList(new ArrayList<AppCloudlet>());
+		if (NetworkConstants.iteration < 10) {
+
+			NetworkConstants.iteration++;
+			this.schedule(getId(), NetworkConstants.nexttime,
+					CloudSimTags.NextCycle);
+		}
+	}
+
+	/**
+	 * Create the virtual machines in a datacenter and submit/schedule cloudlets
+	 * to them.
+	 * 
+	 * @param datacenterId
+	 *            Id of the chosen PowerDatacenter
+	 * 
+	 * @pre $none
+	 * @post $none
+	 */
+	protected void createVmsAndWorkflows(int datacenterId) {
+		
+		createVMsInDatecenter(datacenterId);
+		
+		double[][] workflowDataTransferMap = {{0, 0, 800 * 1024 * 1024}, {0, 0, 800 * 1024 * 1024}, {0, 0, 0}};
+		double[] workflowExecutionMI = {800, 800, 800};
+		psoScheduling = new PSO(workflowDataTransferMap, workflowExecutionMI, linkDC);
+		
+		ArrayList<Integer> taskToVmMap = psoScheduling.runPSO();
+		
+		createWorkflow(workflowDataTransferMap, workflowExecutionMI, taskToVmMap);
+		
+		// send as much vms as possible for this datacenter before trying the
+		// next one
+		int requestedVms = 0;
+
+		setVmsRequested(requestedVms);
+		setVmsAcks(0);
+	}
+	
 	private void CreateVMs(int datacenterId) {
+		// two VMs per host
+		System.out.println("pointer");
+		System.out.println("here" + linkDC.getHostList());
+		int numVM = linkDC.getHostList().size() * NetworkConstants.maxhostVM;
+		
+		double[] mips = {1.011, 1.004, 1.013, 1.0, 0.99, 1.043, 1.023, 0.998};
+		long size = 10000; // image size (MB)
+		int ram = 512; // vm memory (MB)
+		long bw = 1000;
+		int pesNumber = NetworkConstants.HOST_PEs
+				/ NetworkConstants.maxhostVM;
+		String vmm = "Xen"; // VMM name
+		double[] executionCost = {1.21, 1.2, 1.24, 1.18, 1.12, 1.27, 1.25, 1.14};
+		double[][] transferCost = {{0, 0.17, 0.20, 0.20, 0.21, 0.21, 0.18, 0.18},
+				                   {0.17, 0, 0.20, 0.20, 0.21, 0.21, 0.18, 0.18},
+				                   {0.20, 0.20, 0, 0.17, 0.22, 0.22, 0.19, 0.19},
+				                   {0.20, 0.20, 0.17, 0, 0.22, 0.22, 0.19, 0.19},
+				                   {0.21, 0.21, 0.22, 0.22, 0, 0.17, 0.20, 0.20},
+				                   {0.21, 0.21, 0.22, 0.22, 0.17, 0, 0.20, 0.20},
+				                   {0.18, 0.18, 0.19, 0.19, 0.20, 0.20, 0, 0.17},
+				                   {0.18, 0.18, 0.19, 0.19, 0.20, 0.20, 0.17, 0}};
+	
+		for (int i = 0; i < numVM; i++) 
+		{
+			// create VM
+			NetworkVm vm = new NetworkVm(i, getId(), mips[i], pesNumber, ram,
+					bw, size, vmm, new NetworkCloudletSpaceSharedScheduler(), executionCost[i], 
+					transferCost[i]);
+			linkDC.processVmCreateNetwork(vm);
+			// add the VM to the vmList
+			getVmList().add(vm);
+			getVmsToDatacentersMap().put(i, datacenterId);
+			getVmsCreatedList().add(VmList.getById(getVmList(), i));
+		}
+
+	}
+
+	private void CreateVMs2(int datacenterId) {
 		// two VMs per host
 		System.out.println("pointer");
 		System.out.println("here" + linkDC.getHostList());
@@ -490,6 +629,7 @@ public class NetDatacenterBroker extends SimEntity {
 			getVmsToDatacentersMap().put(vmid, datacenterId);
 			getVmsCreatedList().add(VmList.getById(getVmList(), vmid));
 		}
+	
 	}
 
 	/**

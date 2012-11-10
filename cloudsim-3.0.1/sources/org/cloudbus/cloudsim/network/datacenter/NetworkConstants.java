@@ -11,7 +11,7 @@ package org.cloudbus.cloudsim.network.datacenter;
 public class NetworkConstants {
 
 	public static int maxhostVM = 2;
-	public static int HOST_PEs = 8;
+	public static int HOST_PEs = 2;
 
 	public static double maxMemperVM = 1024 * 1024;// kb
 

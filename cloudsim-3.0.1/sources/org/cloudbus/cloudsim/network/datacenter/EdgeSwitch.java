@@ -34,6 +34,7 @@ import org.cloudbus.cloudsim.core.predicates.PredicateType;
  */
 public class EdgeSwitch extends Switch {
 
+
 	/**
 	 * Constructor for Edge Switch We have to specify switches that are connected to its downlink
 	 * and uplink ports, and corresponding bandwidths. In this switch downlink ports are connected
@@ -118,17 +119,21 @@ public class EdgeSwitch extends Switch {
 		// search for the host and packets..send to them
 
 		if (uplinkswitchpktlist != null) {
+			System.out.println("uplinkswitchpktlist != null");
 			for (Entry<Integer, List<NetworkPacket>> es : uplinkswitchpktlist.entrySet()) {
 				int tosend = es.getKey();
 				List<NetworkPacket> hspktlist = es.getValue();
 				if (!hspktlist.isEmpty()) {
 					// sharing bandwidth between packets
 					double avband = uplinkbandwidth / hspktlist.size();
+					System.out.println("uplinkbandwidth: " + uplinkbandwidth);
+					System.out.println("hspktlist.size(): " + hspktlist.size());
+					System.out.println("avband: " + avband);
 					Iterator<NetworkPacket> it = hspktlist.iterator();
 					while (it.hasNext()) {
 						NetworkPacket hspkt = it.next();
 						double delay = 1000 * hspkt.pkt.data / avband;
-
+						System.out.println("delay: " + delay);
 						this.send(tosend, delay, CloudSimTags.Network_Event_UP, hspkt);
 					}
 					hspktlist.clear();
@@ -136,15 +141,24 @@ public class EdgeSwitch extends Switch {
 			}
 		}
 		if (packetTohost != null) {
+			System.out.println("packetTohost != null");
 			for (Entry<Integer, List<NetworkPacket>> es : packetTohost.entrySet()) {
 				List<NetworkPacket> hspktlist = es.getValue();
 				if (!hspktlist.isEmpty()) {
-					double avband = downlinkbandwidth / hspktlist.size();
 					Iterator<NetworkPacket> it = hspktlist.iterator();
 					while (it.hasNext()) {
 						NetworkPacket hspkt = it.next();
 						// hspkt.recieverhostid=tosend;
 						// hs.packetrecieved.add(hspkt);
+						int recvVMid = hspkt.pkt.reciever;
+						int hostid = dc.VmtoHostlist.get(recvVMid);
+						NetworkHost hs = hostlist.get(hostid);
+						double avband = hs.bandwidth / hspktlist.size();
+						System.out.println("downlinkbandwidth: " + hs.bandwidth);
+						System.out.println("hspktlist.size(): " + hspktlist.size());
+						System.out.println("avband: " + avband);
+						System.out.println("hspkt.pkt.data: " + hspkt.pkt.data);
+						System.out.println("delay: " + hspkt.pkt.data / avband);
 						this.send(getId(), hspkt.pkt.data / avband, CloudSimTags.Network_Event_Host, hspkt);
 					}
 					hspktlist.clear();

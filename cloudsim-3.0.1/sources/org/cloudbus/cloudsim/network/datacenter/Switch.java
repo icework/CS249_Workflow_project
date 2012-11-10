@@ -289,8 +289,8 @@ public class Switch extends SimEntity {
 					Iterator<NetworkPacket> it = hspktlist.iterator();
 					while (it.hasNext()) {
 						NetworkPacket hspkt = it.next();
-						double delay = 1000 * hspkt.pkt.data / avband;
-
+						double delay = hspkt.pkt.data / avband;
+						
 						this.send(tosend, delay, CloudSimTags.Network_Event_DOWN, hspkt);
 					}
 					hspktlist.clear();

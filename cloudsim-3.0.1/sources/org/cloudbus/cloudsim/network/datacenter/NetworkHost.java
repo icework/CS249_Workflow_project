@@ -184,9 +184,13 @@ public class NetworkHost extends Host {
 
 		// Sending packet to other VMs therefore packet is forwarded to a Edge switch
 		packetTosendLocal.clear();
+		
 		double avband = bandwidth / packetTosendGlobal.size();
+
 		for (NetworkPacket hs : packetTosendGlobal) {
-			double delay = (1000 * hs.pkt.data) / avband;
+			double delay = hs.pkt.data / avband;
+			System.out.println("bandwidth: " + bandwidth);
+			System.out.println("packetTosendGlobal.size(): " + packetTosendGlobal.size());
 			System.out.println("avband: " + avband);
 			System.out.println("hs.pkt.data: " + hs.pkt.data);
 			System.out.println("delay: " + delay);

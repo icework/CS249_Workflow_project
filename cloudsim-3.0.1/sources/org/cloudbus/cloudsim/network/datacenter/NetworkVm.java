@@ -42,6 +42,25 @@ public class NetworkVm extends Vm implements Comparable<Object> {
 
 		cloudletlist = new ArrayList<NetworkCloudlet>();
 	}
+	
+	public NetworkVm(
+			int id,
+			int userId,
+			double mips,
+			int pesNumber,
+			int ram,
+			long bw,
+			long size,
+			String vmm,
+			CloudletScheduler cloudletScheduler,
+			double executionCost,
+			double[] transferCost) {
+		super(id, userId, mips, pesNumber, ram, bw, size, vmm, cloudletScheduler);
+
+	    this.executionCost = executionCost;
+	    this.transferCost = transferCost;
+		cloudletlist = new ArrayList<NetworkCloudlet>();
+	}
 
 	public ArrayList<NetworkCloudlet> cloudletlist;
 
@@ -54,7 +73,11 @@ public class NetworkVm extends Vm implements Comparable<Object> {
 	public boolean flagfree;// if true it is free
 
 	public double finishtime;
-
+	
+	private double executionCost;
+	
+	private double[] transferCost;
+	
 	public boolean isFree() {
 		return flagfree;
 	}
@@ -69,5 +92,15 @@ public class NetworkVm extends Vm implements Comparable<Object> {
 			return 1;
 		}
 		return 0;
+	}
+	
+	public double getExecutionCost()
+	{
+		return executionCost;
+	}
+	
+	public double[] getBandwidthCost()
+	{
+		return transferCost;
 	}
 }
