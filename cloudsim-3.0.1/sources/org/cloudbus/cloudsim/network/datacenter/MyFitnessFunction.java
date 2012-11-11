@@ -23,6 +23,7 @@ public class MyFitnessFunction extends FitnessFunction{
 		for(int i = 0; i < position.length; i++ )
 		{
 			int vmNum = intPosition[i];
+			System.out.print(intPosition[i]+"+");
 			double taskCost = workFlowTaskExcution[i]/vmData[vmNum][0]*vmData[vmNum][1]; //add execution cost
 			double taskDataTransferCost = 0;
 			for(int j = 0; j < workFlowDataTrans[i].length; j++)
@@ -36,7 +37,7 @@ public class MyFitnessFunction extends FitnessFunction{
 		}
 		
 		fitnessValue = max(vmCost);
-		//System.out.println("fitnessValue: " + fitnessValue);
+		System.out.println("fitnessValue: " + fitnessValue);
 		return fitnessValue;
 	}
 	

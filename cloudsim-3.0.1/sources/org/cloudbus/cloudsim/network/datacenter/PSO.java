@@ -41,7 +41,7 @@ public class PSO {
 		
 		// Set position (and velocity) constraints. I.e.: where to look for solutions
 		swarm.setInertia(0.95);
-		swarm.setMaxPosition(workFlowTaskExecution.length);
+		swarm.setMaxPosition(vmData.length);
 		swarm.setMinPosition(0);
 		swarm.setMaxMinVelocity(0.1);
 		
@@ -55,7 +55,10 @@ public class PSO {
 		} else {
 			// Optimize (and time it)
 			for (int i = 0; i < numberOfIterations; i++)
+			{
 				swarm.evolve();
+				System.out.println(swarm.getBestFitness());
+			}
 		}
 		
 		// transfer double to int
