@@ -80,8 +80,11 @@ public class PSOSchedulingTest {
 					+ NetDatacenterBroker.cachedcloudlet + " Data transfered "
 					+ NetworkConstants.totaldatatransfer);
 			// Print the debt of each user to each datacenter
-			datacenter0.printDebts();
-
+			//datacenter0.printDebts();
+			System.out.println("Total execution cost: " + NetDatacenterBroker.totalExeCost);
+			System.out.println("Total transfer cost: " + NetDatacenterBroker.totalTransferCost);
+			NetDatacenterBroker.totalCost = NetDatacenterBroker.totalExeCost + NetDatacenterBroker.totalTransferCost;
+			System.out.println("Total cost: " + NetDatacenterBroker.totalCost);
 			Log.printLine("CloudSimExample1 finished!");
 		} catch (Exception e) {
 			e.printStackTrace();

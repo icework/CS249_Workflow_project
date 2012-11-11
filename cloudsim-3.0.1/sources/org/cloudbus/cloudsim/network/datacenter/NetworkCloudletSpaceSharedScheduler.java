@@ -131,6 +131,7 @@ public class NetworkCloudletSpaceSharedScheduler extends CloudletScheduler {
 						System.out.println("cl.timespentInStage: " + cl.timespentInStage);
 						System.out.println("st.time: " + st.time);
 						System.out.println("changetonextstage");
+						NetDatacenterBroker.totalExeCost += cl.timespentInStage * NetDatacenterBroker.executionCost[cl.getVmId()];
 						changetonextstage(cl, st);
 						// change the stage
 					}

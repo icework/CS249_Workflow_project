@@ -164,7 +164,8 @@ public class NetworkHost extends Host {
 			hs.pkt.recievetime = CloudSim.clock();
 			// insertthe packet in recievedlist
 			Vm vm = VmList.getById(getVmList(), hs.pkt.reciever);
-
+			NetworkConstants.totaldatatransfer += hs.pkt.data;
+			NetDatacenterBroker.totalTransferCost += hs.pkt.data * NetDatacenterBroker.transferCost[hs.pkt.sender][hs.pkt.reciever];
 			List<HostPacket> pktlist = ((NetworkCloudletSpaceSharedScheduler) vm.getCloudletScheduler()).pktrecv
 					.get(hs.pkt.sender);
 			if (pktlist == null) {
@@ -195,7 +196,7 @@ public class NetworkHost extends Host {
 			System.out.println("hs.pkt.data: " + hs.pkt.data);
 			System.out.println("delay: " + delay);
 			NetworkConstants.totaldatatransfer += hs.pkt.data;
-
+			NetDatacenterBroker.totalTransferCost += hs.pkt.data * NetDatacenterBroker.transferCost[hs.pkt.sender][hs.pkt.reciever];
 			CloudSim.send(getDatacenter().getId(), sw.getId(), delay, CloudSimTags.Network_Event_UP, hs);
 			// send to switch with delay
 		}
