@@ -86,5 +86,7 @@ public class NetworkCloudlet extends Cloudlet implements Comparable<Object> {
 	public double getSubmittime() {
 		return submittime;
 	}
+	
+
 
 }

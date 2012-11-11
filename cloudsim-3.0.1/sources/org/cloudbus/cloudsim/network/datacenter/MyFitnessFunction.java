@@ -4,6 +4,7 @@ import net.sourceforge.jswarm_pso.FitnessFunction;
 
 public class MyFitnessFunction extends FitnessFunction{
 	public MyFitnessFunction(double[][] td, double[] et, double[][] vd, double[][] vt){
+		super(false);
 		workFlowDataTrans = td;
 		workFlowTaskExcution = et;
 		vmData = vd;
@@ -13,6 +14,7 @@ public class MyFitnessFunction extends FitnessFunction{
 	public double evaluate(double position[]) {
 		double fitnessValue = 0;
 		int[] intPosition = new int[position.length];
+		//System.out.println("position.length: " + position.length);
 		for(int i = 0; i < position.length; i++ )
 		{
 			intPosition[i] = (int)position[i];
@@ -24,7 +26,11 @@ public class MyFitnessFunction extends FitnessFunction{
 		{
 			int vmNum = intPosition[i];
 			System.out.print(intPosition[i]+"+");
-			double taskCost = workFlowTaskExcution[i]/vmData[vmNum][0]*vmData[vmNum][1]; //add execution cost
+
+			double taskCost = workFlowTaskExcution[i] / vmData[vmNum][0] * vmData[vmNum][1]; //add execution cost
+			//System.out.println("workFlowTaskExcution[i]: " + workFlowTaskExcution[i]);
+			//System.out.println("vmData[vmNum][0]" + vmData[vmNum][0]);
+			//System.out.println("vmData[vmNum][1]" + vmData[vmNum][1]);
 			double taskDataTransferCost = 0;
 			for(int j = 0; j < workFlowDataTrans[i].length; j++)
 			{
@@ -33,7 +39,10 @@ public class MyFitnessFunction extends FitnessFunction{
 					taskDataTransferCost += workFlowDataTrans[i][j] * vmTransferCost[vmNum][intPosition[j]]; //add the task output file transfer cost
 				}
 			}
+			//System.out.println("taskCost: " + taskCost);
+			//System.out.println("taskDataTransferCost: " + taskDataTransferCost);
 			vmCost[vmNum] = taskDataTransferCost + taskCost;
+			//System.out.println("vmCost[vmNum]: " + vmCost[vmNum]);
 		}
 		
 		fitnessValue = max(vmCost);

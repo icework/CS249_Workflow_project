@@ -27,8 +27,9 @@ public class PSO {
 	{
 		// Create a swarm (using 'MyParticle' as sample particle and 'MyFitnessFunction' as fitness function)
 		Swarm swarm = new Swarm(Swarm.DEFAULT_NUMBER_OF_PARTICLES, 
-				               new MyParticle(), 
+				               new MyParticle(workFlowTaskExecution.length), 
 				               new MyFitnessFunction(workFlowDataTrans, workFlowTaskExecution, vmData, vmTransferCost));
+		//System.out.println("workFlowTaskExecution.length: " + workFlowTaskExecution.length);
 		// Use neighborhood
 		Neighborhood neigh = new Neighborhood1D(Swarm.DEFAULT_NUMBER_OF_PARTICLES / 5, true);
 		swarm.setNeighborhood(neigh);
@@ -41,11 +42,12 @@ public class PSO {
 		
 		// Set position (and velocity) constraints. I.e.: where to look for solutions
 		swarm.setInertia(0.95);
-		swarm.setMaxPosition(vmData.length);
+
+		swarm.setMaxPosition(vmData.length - 1);  //change
 		swarm.setMinPosition(0);
 		swarm.setMaxMinVelocity(0.1);
 		
-		int numberOfIterations = 100;
+		int numberOfIterations = 10;
 		boolean showGraphics = false;
 		
 		if (showGraphics) {
@@ -80,6 +82,7 @@ public class PSO {
 	{
 	    List<NetworkVm> vmList = datacenter.getVmList();
 	    int sizeOfVm = vmList.size();
+	    System.out.println("sizeOfVm: " + sizeOfVm);
 	    Iterator<NetworkVm> it = vmList.iterator();
 	    int count = 0;
 	    vmData = new double[sizeOfVm][2];

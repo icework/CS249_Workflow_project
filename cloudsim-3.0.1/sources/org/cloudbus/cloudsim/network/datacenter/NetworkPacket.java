@@ -49,4 +49,5 @@ public class NetworkPacket {
 	double stime;// time when sent
 
 	double rtime;// time when received
+	
 }

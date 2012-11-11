@@ -97,4 +97,9 @@ public class AppCloudlet {
 		// based on type
 
 	}
+	public void createCloudletList2(double[][] workflowDataTransferMap, double[] workflowExecutionMI, List<Integer> vmIdList)
+	{
+		
+	}
+	
 }

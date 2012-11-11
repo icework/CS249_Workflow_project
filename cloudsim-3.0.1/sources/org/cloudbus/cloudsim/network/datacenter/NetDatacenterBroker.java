@@ -90,7 +90,25 @@ public class NetDatacenterBroker extends SimEntity {
 	public boolean createvmflag = true;
 
 	public static int cachedcloudlet = 0;
-
+	
+	public static double totalTransferCost = 0;
+	
+	public static double totalExeCost = 0;
+	
+	public static double totalCost = 0;
+	
+	//public static double[] executionCost = {1.26, 1.25, 1.24, 1.18, 1.12, 1.27, 1.25, 1.14};
+	public static double[] executionCost = {1.21, 1.2, 1.24, 1.18, 1.12, 1.27, 1.25, 1.14};
+	public static double[][] transferCost = {{0, 0.17, 0.20, 0.20, 0.21, 0.21, 0.18, 0.18},
+			                   {0.17, 0, 0.20, 0.20, 0.21, 0.21, 0.18, 0.18},
+			                   {0.20, 0.20, 0, 0.17, 0.22, 0.22, 0.19, 0.19},
+			                   {0.20, 0.20, 0.17, 0, 0.22, 0.22, 0.19, 0.19},
+			                   {0.21, 0.21, 0.22, 0.22, 0, 0.17, 0.20, 0.20},
+			                   {0.21, 0.21, 0.22, 0.22, 0.17, 0, 0.20, 0.20},
+			                   {0.18, 0.18, 0.19, 0.19, 0.20, 0.20, 0, 0.17},
+			                   {0.18, 0.18, 0.19, 0.19, 0.20, 0.20, 0.17, 0}};
+	public static double[] mips = {1, 1, 1, 1, 1, 1, 1, 1};
+	//public static double[] mips = {1.011, 1.004, 1.013, 1.0, 0.99, 1.043, 1.023, 0.998};
 	/**
 	 * Created a new DatacenterBroker object.
 	 * 
@@ -483,8 +501,11 @@ public class NetDatacenterBroker extends SimEntity {
 		// generate Application execution Requests
 		for (int i = 0; i < 1; i++) 
 		{
-			this.getAppCloudletList().add(
+			/*this.getAppCloudletList().add(
 					new WorkflowApp(AppCloudlet.APP_Workflow,
+							NetworkConstants.currentAppId, 0, getVmList().size(), getId()));*/
+			this.getAppCloudletList().add(
+					new PSOWorkflow(AppCloudlet.APP_Workflow,
 							NetworkConstants.currentAppId, 0, getVmList().size(), getId()));
 			NetworkConstants.currentAppId++;
 
@@ -501,7 +522,7 @@ public class NetDatacenterBroker extends SimEntity {
 			{
 				if (!taskToVmMap.isEmpty()) 
 				{
-					app.createCloudletList(taskToVmMap);
+					app.createCloudletList2(workflowDataTransferMap,  workflowExecutionMI, taskToVmMap);
 					for (int i = 0; i < workflowExecutionMI.length; i++) {
 						app.clist.get(i).setUserId(getId());
 						appCloudletRecieved.put(app.appID, app.numbervm);
@@ -541,8 +562,28 @@ public class NetDatacenterBroker extends SimEntity {
 		
 		createVMsInDatecenter(datacenterId);
 		
-		double[][] workflowDataTransferMap = {{0, 0, 800 * 1024 * 1024}, {0, 0, 800 * 1024 * 1024}, {0, 0, 0}};
-		double[] workflowExecutionMI = {800, 800, 800};
+		/*double[][] workflowDataTransferMap = {{0, 0, 80 * 1024 * 1024}, 
+				                              {0, 0, 80 * 1024 * 1024}, 
+				                              {0, 0, 0}};*/
+		//double[] workflowExecutionMI = {8000, 8000, 8000};
+		double[] workflowExecutionMI = {8000, 6000, 7000, 9000, 10000, 9000, 6000, 7000, 9000, 8000};
+		double[][] workflowDataTransferMap = {{0, 80, 90, 100, 0, 0, 0, 0, 0, 0}, 
+                                              {0, 0, 0, 0, 60, 0, 0, 0, 0, 0}, 
+                                              {0, 0, 0, 0, 50, 70, 80, 0, 0, 0},
+                                              {0, 0, 0, 0, 0, 50, 0, 60, 0, 0},
+                                              {0, 0, 0, 0, 0, 0, 60, 0, 0, 0},
+                                              {0, 0, 0, 0, 0, 0, 0, 80, 90, 0},
+                                              {0, 0, 0, 0, 0, 0, 0, 0, 100, 0},
+                                              {0, 0, 0, 0, 0, 0, 0, 0, 0, 50},
+                                              {0, 0, 0, 0, 0, 0, 0, 0, 0, 90},
+                                              {0, 0, 0, 0, 0, 0, 0, 0, 0, 0}};
+		for (int i = 0; i < workflowExecutionMI.length; i++)
+		{
+			for (int j = 0; j < workflowExecutionMI.length; j++)
+			{
+				workflowDataTransferMap[i][j] *= 1024 * 1024;
+			}
+		}
 		psoScheduling = new PSO(workflowDataTransferMap, workflowExecutionMI, linkDC);
 		
 		ArrayList<Integer> taskToVmMap = psoScheduling.runPSO();
@@ -565,25 +606,23 @@ public class NetDatacenterBroker extends SimEntity {
 		System.out.println("pointer");
 		System.out.println("here" + linkDC.getHostList());
 		int numVM = linkDC.getHostList().size() * NetworkConstants.maxhostVM;
+		System.out.println("numVM:" + numVM);
 		
-		double[] mips = {1, 1, 1, 1, 1, 1, 1, 1};
-		//double[] mips = {1.011, 1.004, 1.013, 1.0, 0.99, 1.043, 1.023, 0.998};
+
 		long size = 10000; // image size (MB)
 		int ram = 512; // vm memory (MB)
 		long bw = 1000;
 		int pesNumber = NetworkConstants.HOST_PEs
 				/ NetworkConstants.maxhostVM;
 		String vmm = "Xen"; // VMM name
-		double[] executionCost = {1.21, 1.2, 1.24, 1.18, 1.12, 1.27, 1.25, 1.14};
-		double[][] transferCost = {{0, 0.17, 0.20, 0.20, 0.21, 0.21, 0.18, 0.18},
-				                   {0.17, 0, 0.20, 0.20, 0.21, 0.21, 0.18, 0.18},
-				                   {0.20, 0.20, 0, 0.17, 0.22, 0.22, 0.19, 0.19},
-				                   {0.20, 0.20, 0.17, 0, 0.22, 0.22, 0.19, 0.19},
-				                   {0.21, 0.21, 0.22, 0.22, 0, 0.17, 0.20, 0.20},
-				                   {0.21, 0.21, 0.22, 0.22, 0.17, 0, 0.20, 0.20},
-				                   {0.18, 0.18, 0.19, 0.19, 0.20, 0.20, 0, 0.17},
-				                   {0.18, 0.18, 0.19, 0.19, 0.20, 0.20, 0.17, 0}};
-	
+
+		for (int i = 0; i < executionCost.length; i++)
+		{
+			for (int j = 0; j < executionCost.length; j++)
+			{
+				transferCost[i][j] /= 3600;
+			}
+		}
 		for (int i = 0; i < numVM; i++) 
 		{
 			// create VM
